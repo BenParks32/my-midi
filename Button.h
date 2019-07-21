@@ -7,7 +7,7 @@
 class IButtonDelegate
 {
   public:
-    virtual const void buttonPressed(const byte& number) = 0;
+    virtual void buttonPressed(const byte number) = 0;
 };
 
 enum ButtonState {IS_OPEN, IS_RISING, IS_CLOSED, IS_FALLING};
@@ -15,15 +15,14 @@ enum ButtonState {IS_OPEN, IS_RISING, IS_CLOSED, IS_FALLING};
 class Button
 {
   public:
-    Button(const byte& number, const byte& pin, const IButtonDelegate& delegate);
+    Button(const byte number, const byte pin, const IButtonDelegate& delegate);
 
   private:
     Button();
     Button(const Button& rhs);
 
   public:
-    const void init() const;
-    const void updateState();
+    void updateState();
 
   private:
     const Bounce _debouncer;

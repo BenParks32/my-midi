@@ -4,141 +4,149 @@
 
 const byte MAX_PATCH = 39;
 
+const byte BUTTON_ONE = 1;
+const byte BUTTON_TWO = 2;
+const byte BUTTON_THREE = 3;
+const byte BUTTON_FOUR = 4;
+
+const byte LIGHT_ONE = 0;
+const byte LIGHT_TWO = 1;
+const byte LIGHT_THREE = 2;
+const byte LIGHT_FOUR = 3;
+
 //////////////////////////////////
-// Patch Mode
-PatchMode::PatchMode(const LightManager& lightManager) :
+// Bank Mode
+BankMode::BankMode(const LightManager& lightManager) :
   _lightManager(lightManager),
-  _activePatch(0)
+  _activeBank(0)
 {
 }
 
-PatchMode::PatchMode()
+BankMode::BankMode() :
+  _lightManager(LightManager(0, 0)),
+  _activeBank(0)
 {
 }
 
-PatchMode::PatchMode(const PatchMode& rhs)
+BankMode::BankMode(const BankMode& rhs) :
+  _lightManager(rhs._lightManager),
+  _activeBank(rhs._activeBank)
 {
 }
 
-const char* PatchMode::getName() const
-{
-  return "PatchMode";
-}
-
-const void PatchMode::activate() const
+void BankMode::activate() const
 {
   _lightManager.turnAllOff();
-  _lightManager.turnOn(0);  
-  _lightManager.turnOn(2);
-  _lightManager.setFlashing(3, true);
+  _lightManager.turnOn(LIGHT_ONE);  
+  _lightManager.turnOn(LIGHT_THREE);
+  _lightManager.setFlashing(LIGHT_FOUR, true);
 }
 
-const void PatchMode::buttonPressed(const byte& number)
+void BankMode::buttonPressed(const byte number)
 {
   switch(number)
   {
-    case 1:
+    case BUTTON_ONE:
     {
-      Serial.println("Patch up");
-      if(_activePatch < MAX_PATCH)
-        ++_activePatch;
+      if(_activeBank < MAX_PATCH)
+        ++_activeBank;
       else
-        _activePatch = 0;
+        _activeBank = 0;
     } break;
 
-    case 3:
+    case BUTTON_THREE:
     {
-      Serial.println("Patch down");
-      if(_activePatch > 0)
-        --_activePatch;
+      if(_activeBank > 0)
+        --_activeBank;
       else
-        _activePatch = MAX_PATCH;
+        _activeBank = MAX_PATCH;
     } break;
 
     default:
-      Serial.println("Do nothing!");
       break;
   } 
-
-  Serial.print("New patch is ");
-  Serial.println(_activePatch);
-  Serial.print("Send Stomp PC ");
-  Serial.println(_activePatch);
 }
 
-const byte PatchMode::getPatch() const
+byte BankMode::getBank() const
 {
-  return _activePatch;
+  return _activeBank;
 }
 
 //////////////////////////////////
 // Normal Mode
-NormalMode::NormalMode(const LightManager& lightManager, const PatchMode& patchMode) :
+NormalMode::NormalMode(const LightManager& lightManager, const BankMode& bankMode) :
   _lightManager(lightManager),
-  _patchMode(patchMode),
+  _bankMode(bankMode),
   _activeButton(0)
 {
 }
 
-NormalMode::NormalMode()
+NormalMode::NormalMode() :
+  _lightManager(LightManager(0,0)),
+  _bankMode(BankMode(LightManager(0,0))),
+  _activeButton(0)
 {
 }
 
-NormalMode::NormalMode(const NormalMode& rhs)
+NormalMode::NormalMode(const NormalMode& rhs) :
+  _lightManager(rhs._lightManager),
+  _bankMode(rhs._bankMode),
+  _activeButton(rhs._activeButton)
 {
 }
 
-const char* NormalMode::getName() const
+void NormalMode::activate() const
 {
-  return "NormalMode";
-}
-
-const void NormalMode::activate() const
-{
-  _lightManager.setFlashing(3, false);
+  _lightManager.setFlashing(LIGHT_FOUR, false);
   
   _lightManager.turnAllOff();
   _lightManager.turnOn(_activeButton);  
-  _lightManager.turnOn(3);
+  _lightManager.turnOn(LIGHT_FOUR);
 }
 
-const void NormalMode::buttonPressed(const byte& number)
+void NormalMode::buttonPressed(const byte number)
 {
   _lightManager.turnOff(_activeButton);
   _activeButton = number - 1;
   _lightManager.turnOn(_activeButton);
   
-  Serial.print("Send Stomp SS CC 69 ");
-  Serial.println(_activeButton);
+  // Serial.print("Send Stomp SS CC 69 ");
+  // Serial.println(_activeButton);
 
-  const byte activePatch = _patchMode.getPatch();
-  Serial.print("Send Amp PC ");
-  Serial.println((activePatch * 3) + _activeButton);
+  const byte activeBank = _bankMode.getBank();
+  // Serial.print("Send Amp PC ");
+  // Serial.println((activeBank * 3) + _activeButton);
 }
 
 //////////////////////////////////
 // Mode Manager
-ModeManager::ModeManager()
-{
-}
-
-ModeManager::ModeManager(const ModeManager& rhs)
-{
-}
-
-ModeManager::ModeManager(IMode** ppModes, const byte& nModes) :
+ModeManager::ModeManager(IMode** ppModes, const byte nModes) :
   _ppModes(ppModes),
   _nModes(nModes),
   _currentMode(0)
 {
 }
 
-const IMode& ModeManager::getMode() const
+ModeManager::ModeManager():
+  _ppModes(0),
+  _nModes(0),
+  _currentMode(0)
+{
+}
+
+ModeManager::ModeManager(const ModeManager& rhs):
+  _ppModes(rhs._ppModes),
+  _nModes(rhs._nModes),
+  _currentMode(rhs._currentMode)
+{
+}
+
+IMode& ModeManager::getMode() const
 {
   return *_ppModes[_currentMode];
 }
 
-const void ModeManager::buttonPressed(const byte& number)
+void ModeManager::buttonPressed(const byte number)
 {
   if (_currentMode + 1 < _nModes)
   {
@@ -148,7 +156,5 @@ const void ModeManager::buttonPressed(const byte& number)
   {
     _currentMode = 0;
   }
-  _ppModes[_currentMode]->activate();
-  Serial.print("New mode is ");
-  Serial.println(_ppModes[_currentMode]->getName());
+  _ppModes[_currentMode]->activate();  
 }

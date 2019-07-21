@@ -2,21 +2,23 @@
 #include <Arduino.h>
 #include "ButtonHandler.h"
 
-ButtonHandler::ButtonHandler()
-{
-}
-
-ButtonHandler::ButtonHandler(const ButtonHandler& rhs)
-{
-}
-
 ButtonHandler::ButtonHandler(const ModeManager& modeManager) :
   _modeManager(modeManager)
 {
 }
 
-const void ButtonHandler::buttonPressed(const byte& number)
+ButtonHandler::ButtonHandler() :
+  _modeManager(ModeManager(0, 0))
 {
-  const IMode& mode = _modeManager.getMode();
+}
+
+ButtonHandler::ButtonHandler(const ButtonHandler& rhs):
+  _modeManager(rhs._modeManager)
+{
+}
+
+void ButtonHandler::buttonPressed(const byte number)
+{
+  IMode& mode = _modeManager.getMode();
   mode.buttonPressed(number);
 }

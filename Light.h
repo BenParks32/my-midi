@@ -4,18 +4,18 @@
 class Light
 {
   public:
-    Light(const byte& number, const byte& pin);
+    Light(const byte number, const byte pin);
 
   private:
     Light();
     Light(const Light& rhs);
 
   public:
-    const void turnOn() const;
-    const void turnOn(bool on) const;
-    const void turnOff() const;
-    const void setFlashing(const bool flashing);
-    const bool isFlashing() const;
+    void turnOn() const;
+    void turnOn(bool on) const;
+    void turnOff() const;
+    void setFlashing(const bool flashing);
+    bool isFlashing() const;
 
   private:
     const byte _number;

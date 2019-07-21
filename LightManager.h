@@ -6,22 +6,22 @@
 class LightManager
 {
   public:
-    LightManager(Light** ppLights, const byte& nLights);
+    LightManager(Light** ppLights, const byte nLights);
 
   private:
     LightManager();
     LightManager(const LightManager& rhs);
 
   public:
-    const void turnOn(const byte& number, const bool on) const;
-    const void turnOn(const byte& number) const;
-    const void turnOff(const byte& number) const;
-    const void turnAllOff() const;
-    const void setFlashing(const byte& number, const bool flashing) const;
-    const void updateLights();
+    void turnOn(const byte number, const bool on) const;
+    void turnOn(const byte number) const;
+    void turnOff(const byte number) const;
+    void turnAllOff() const;
+    void setFlashing(const byte number, const bool flashing) const;
+    void updateLights();
 
   private:
-    const Light** _ppLights;
+    Light** _ppLights;
     const byte _nLights;
 
     long _chrono;

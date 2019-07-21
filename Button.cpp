@@ -8,7 +8,7 @@ Button::Button(const Button& rhs)
 {
 }
 
-Button::Button(const byte& number, const byte& pin, const IButtonDelegate& delegate) :
+Button::Button(const byte number, const byte pin, const IButtonDelegate& delegate) :
   _debouncer(Bounce()),
   _number(number),
   _pin(pin),
@@ -20,7 +20,7 @@ Button::Button(const byte& number, const byte& pin, const IButtonDelegate& deleg
   _debouncer.interval(5);
 }
 
-const void Button::updateState()
+void Button::updateState()
 {
   _debouncer.update();
   byte pinIs = _debouncer.read(); 

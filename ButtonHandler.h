@@ -9,7 +9,7 @@ class ButtonHandler : public IButtonDelegate
 {
   public:
     ButtonHandler(const ModeManager& modeManager);
-    virtual const void buttonPressed(const byte& pin);
+    virtual void buttonPressed(const byte pin);
 
   private:    
     ButtonHandler();

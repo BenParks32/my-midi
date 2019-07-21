@@ -2,22 +2,28 @@
 #include <Arduino.h>
 #include "LightManager.h"
 
-LightManager::LightManager(Light** ppLights, const byte& nLights) :
+LightManager::LightManager(Light** ppLights, const byte nLights) :
   _ppLights(ppLights),
   _nLights(nLights),
   _chrono(millis())
 {
 }
 
-LightManager::LightManager()
+LightManager::LightManager() :
+  _ppLights(0),
+  _nLights(0),
+  _chrono(0)
 {
 }
 
-LightManager::LightManager(const LightManager& rhs)
+LightManager::LightManager(const LightManager& rhs) :
+  _ppLights(rhs._ppLights),
+  _nLights(rhs._nLights),
+  _chrono(rhs._chrono)
 {
 }
 
-const void LightManager::turnOn(const byte& number, const bool on) const
+void LightManager::turnOn(const byte number, const bool on) const
 {
   if (on)
     turnOn(number);
@@ -25,17 +31,17 @@ const void LightManager::turnOn(const byte& number, const bool on) const
     turnOff(number);
 }
 
-const void LightManager::turnOn(const byte& number) const
+void LightManager::turnOn(const byte number) const
 {
   _ppLights[number]->turnOn();
 }
 
-const void LightManager::turnOff(const byte& number) const
+void LightManager::turnOff(const byte number) const
 {
   _ppLights[number]->turnOff();
 }
 
-const void LightManager::turnAllOff() const
+void LightManager::turnAllOff() const
 {
   for (int i = 0; i < _nLights; ++i)
   {
@@ -43,12 +49,12 @@ const void LightManager::turnAllOff() const
   }
 }
 
-const void LightManager::setFlashing(const byte& number, const bool flashing) const
+void LightManager::setFlashing(const byte number, const bool flashing) const
 {
   _ppLights[number]->setFlashing(flashing);
 }
 
-const void LightManager::updateLights()
+void LightManager::updateLights()
 {
   long now = millis();
   if (now - _chrono > 250)

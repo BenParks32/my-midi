@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "Light.h"
 
-Light::Light(const byte& number, const byte& pin) :
+Light::Light(const byte number, const byte pin) :
   _number(number),
   _pin(pin),
   _flashing(false)
@@ -10,15 +10,21 @@ Light::Light(const byte& number, const byte& pin) :
   pinMode(_pin, OUTPUT);
 }
 
-Light::Light()
+Light::Light() :
+  _number(0),
+  _pin(0),
+  _flashing(false)
 { 
 }
 
-Light::Light(const Light& rhs)
+Light::Light(const Light& rhs) :
+  _number(rhs._number),
+  _pin(rhs._pin),
+  _flashing(rhs._flashing)
 { 
 }
 
-const void Light::turnOn(bool on) const
+void Light::turnOn(bool on) const
 {
   if(on)
     turnOn();
@@ -26,22 +32,22 @@ const void Light::turnOn(bool on) const
     turnOff();  
 }
 
-const void Light::turnOn() const
+void Light::turnOn() const
 {
   digitalWrite(_pin, HIGH);
 }
 
-const void Light::turnOff() const
+void Light::turnOff() const
 {  
   digitalWrite(_pin, LOW);
 }
 
-const void Light::setFlashing(const bool flashing)
+void Light::setFlashing(const bool flashing)
 {
   _flashing = flashing;
 }
 
-const bool Light::isFlashing() const
+bool Light::isFlashing() const
 {
   return _flashing;
 }
