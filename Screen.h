@@ -61,6 +61,31 @@ class BankDownGlyph : public BankGlyph
     BankDownGlyph();
 };
 
+class BankNumberGlyph : public IGlyph
+{
+  public:
+    BankNumberGlyph(const byte bank);
+    
+  public:
+    virtual void draw(const screen_t& ctx) const;
+
+  private:
+    byte _bank;
+};
+
+class ModeGlyph : public IGlyph
+{
+  public:
+    ModeGlyph(const char** pLines, const byte numLines);
+    
+  public:
+    virtual void draw(const screen_t& ctx) const;   
+
+  private:
+    const char** _pLines;
+    const byte _numLines;
+};
+
 class Screen
 {
   public:
@@ -73,6 +98,7 @@ class Screen
   public:
     void setup() const;
     void draw(const IGlyph& glyph) const;
+    void clear() const;
 
   private:
     const screen_t _u8g2;

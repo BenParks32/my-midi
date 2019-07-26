@@ -14,6 +14,11 @@ const byte LIGHT_TWO = 1;
 const byte LIGHT_THREE = 2;
 const byte LIGHT_FOUR = 3;
 
+const byte SCREEN_ONE = 0;
+const byte SCREEN_TWO = 1;
+const byte SCREEN_THREE = 2;
+const byte SCREEN_FOUR = 3;
+
 const byte STOMP_SNAPSHOT_CC = 69;
 const byte STOMP_TUNER_CC = 68;
 
@@ -32,8 +37,12 @@ BankMode::BankMode(const midi_t& midi, const LightManager& lightManager, const S
 
 void BankMode::activate()
 {
-  _ppScreens[0]->draw(BankDownGlyph());
-  _ppScreens[1]->draw(BankUpGlyph());
+  const char* modeLines[2] = { "Select","Bank" };
+  
+  _ppScreens[SCREEN_ONE]->draw(BankDownGlyph());
+  _ppScreens[SCREEN_TWO]->draw(BankNumberGlyph(_activeBank));
+  _ppScreens[SCREEN_THREE]->draw(BankUpGlyph());  
+  _ppScreens[SCREEN_FOUR]->draw(ModeGlyph(modeLines, 2));  
 
   _lightManager.turnAllOff();
   _lightManager.turnOn(LIGHT_ONE);  
@@ -65,6 +74,7 @@ void BankMode::buttonPressed(const byte number)
       break;
   }
 
+  _ppScreens[SCREEN_TWO]->draw(BankNumberGlyph(_activeBank));
   _midi.sendProgramChange(_activeBank, STOMP_MIDI_CHANNEL);
 }
 
@@ -98,9 +108,11 @@ NormalMode::NormalMode(const NormalMode& rhs) :
 
 void NormalMode::activate()
 {
-  _ppScreens[0]->draw(PatchGlyph("A"));
-  _ppScreens[1]->draw(PatchGlyph("B"));
-  
+  _ppScreens[SCREEN_ONE]->draw(PatchGlyph("A"));
+  _ppScreens[SCREEN_TWO]->draw(PatchGlyph("B"));
+  _ppScreens[SCREEN_THREE]->draw(PatchGlyph("C"));
+  _ppScreens[SCREEN_FOUR]->draw(BankNumberGlyph(_bankMode.getBank()));
+    
   _lightManager.setFlashing(LIGHT_FOUR, false);
   
   _lightManager.turnAllOff();

@@ -21,7 +21,9 @@ LightManager lightManager(leds, BUTTON_COUNT);
 
 Screen scr1(A0);
 Screen scr2(A1);
-Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr1, &scr2};
+Screen scr3(A2);
+Screen scr4(A3);
+Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr3, &scr4};
 
 BankMode bankMode(MIDI, lightManager, screens);
 NormalMode normalMode(MIDI, lightManager, screens, bankMode);
@@ -37,8 +39,10 @@ Button btn4(4, 8, modeManager);
 Button *buttons[BUTTON_COUNT] {&btn1, &btn2, &btn3, &btn4};
 
 void setup() {    
-  scr1.setup();
-  scr2.setup();
+  for(int i=0; i < BUTTON_COUNT; ++i)
+  {
+    screens[i]->setup();
+  }
   normalMode.activate();
   MIDI.begin(MIDI_CHANNEL_OFF);
 }
