@@ -5,6 +5,7 @@
 #include "Mode.h"
 #include "Light.h"
 #include "LightManager.h"
+#include "Screen.h"
 
 const byte MODE_COUNT = 2;
 const byte BUTTON_COUNT = 4;
@@ -18,8 +19,12 @@ Light led4(4, 9);
 Light *leds[BUTTON_COUNT] {&led1, &led2, &led3, &led4};
 LightManager lightManager(leds, BUTTON_COUNT);
 
-BankMode bankMode(MIDI, lightManager);
-NormalMode normalMode(MIDI, lightManager, bankMode);
+Screen scr1(A0);
+Screen scr2(A1);
+Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr1, &scr2};
+
+BankMode bankMode(MIDI, lightManager, screens);
+NormalMode normalMode(MIDI, lightManager, screens, bankMode);
 IMode *modes[MODE_COUNT] {&normalMode, &bankMode};
 
 const ModeManager modeManager(modes, MODE_COUNT);
@@ -32,6 +37,8 @@ Button btn4(4, 8, modeManager);
 Button *buttons[BUTTON_COUNT] {&btn1, &btn2, &btn3, &btn4};
 
 void setup() {    
+  scr1.setup();
+  scr2.setup();
   normalMode.activate();
   MIDI.begin(MIDI_CHANNEL_OFF);
 }

@@ -5,6 +5,7 @@
 
 #include "LightManager.h"
 #include "Button.h"
+#include "Screen.h"
 
 typedef midi::MidiInterface<HardwareSerial> midi_t;
 
@@ -18,7 +19,7 @@ class IMode
 class BankMode : public IMode
 {
   public:
-    BankMode(const midi_t& midi, const LightManager& lightManager);
+    BankMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens);
 
   private:
     BankMode();
@@ -33,14 +34,14 @@ class BankMode : public IMode
   private:
     const midi_t& _midi;
     const LightManager& _lightManager;
+    const Screen** _ppScreens;
     byte _activeBank;
-    bool _tunerOn;
 };
 
 class NormalMode : public IMode
 {
   public:
-    NormalMode(const midi_t& midi, const LightManager& lightManager, const BankMode& bankMode);
+    NormalMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens, const BankMode& bankMode);
 
   private:
     NormalMode();
@@ -56,6 +57,7 @@ class NormalMode : public IMode
   private:
     const midi_t& _midi;
     const LightManager& _lightManager;
+    const Screen** _ppScreens;
     const BankMode& _bankMode;
     byte _activeButton;
 };

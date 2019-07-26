@@ -22,33 +22,23 @@ const byte AMP_MIDI_CHANNEL = 2;
 
 //////////////////////////////////
 // Bank Mode
-BankMode::BankMode(const midi_t& midi, const LightManager& lightManager) :
+BankMode::BankMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens) :
   _midi(midi),
   _lightManager(lightManager),
-  _activeBank(0),
-  _tunerOn(false)
-{
-}
-
-BankMode::BankMode()
-{
-}
-
-BankMode::BankMode(const BankMode& rhs) :
-  _midi(rhs._midi),
-  _lightManager(rhs._lightManager),
-  _activeBank(rhs._activeBank),
-  _tunerOn(rhs._tunerOn)
+  _ppScreens(ppScreens),
+  _activeBank(0)
 {
 }
 
 void BankMode::activate()
 {
+  _ppScreens[0]->draw(BankDownGlyph());
+  _ppScreens[1]->draw(BankUpGlyph());
+
   _lightManager.turnAllOff();
   _lightManager.turnOn(LIGHT_ONE);  
   _lightManager.turnOn(LIGHT_THREE);
   _lightManager.setFlashing(LIGHT_FOUR, true);
-  _tunerOn = false;
 }
 
 void BankMode::buttonPressed(const byte number)
@@ -62,15 +52,6 @@ void BankMode::buttonPressed(const byte number)
       else
         _activeBank = MAX_PATCH;
     } break;
-
-    /*
-    case BUTTON_TWO:
-    {
-      _midi.sendControlChange(STOMP_TUNER_CC, 0, STOMP_MIDI_CHANNEL);
-      _tunerOn = !_tunerOn;
-      _lightManager.turnOn(LIGHT_TWO, _tunerOn);
-    } break;
-    */
     
     case BUTTON_THREE:
     {
@@ -94,9 +75,10 @@ byte BankMode::getBank() const
 
 //////////////////////////////////
 // Normal Mode
-NormalMode::NormalMode(const midi_t& midi, const LightManager& lightManager, const BankMode& bankMode) :
+NormalMode::NormalMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens, const BankMode& bankMode) :
   _midi(midi),
   _lightManager(lightManager),
+  _ppScreens(ppScreens),
   _bankMode(bankMode),
   _activeButton(0)
 {
@@ -116,6 +98,9 @@ NormalMode::NormalMode(const NormalMode& rhs) :
 
 void NormalMode::activate()
 {
+  _ppScreens[0]->draw(PatchGlyph("A"));
+  _ppScreens[1]->draw(PatchGlyph("B"));
+  
   _lightManager.setFlashing(LIGHT_FOUR, false);
   
   _lightManager.turnAllOff();
