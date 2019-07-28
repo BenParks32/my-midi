@@ -27,7 +27,7 @@ const byte AMP_MIDI_CHANNEL = 2;
 
 //////////////////////////////////
 // Bank Mode
-BankMode::BankMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens) :
+BankMode::BankMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens) :
   _midi(midi),
   _lightManager(lightManager),
   _ppScreens(ppScreens),
@@ -38,10 +38,9 @@ BankMode::BankMode(const midi_t& midi, const LightManager& lightManager, const S
 void BankMode::activate()
 {
   const char* modeLines[2] = { "Select","Bank" };
-  
-  _ppScreens[SCREEN_ONE]->draw(BankDownGlyph());
+  _ppScreens[SCREEN_ONE]->draw(ArrowGlyph(ARROW_DOWN));
   _ppScreens[SCREEN_TWO]->draw(BankNumberGlyph(_activeBank));
-  _ppScreens[SCREEN_THREE]->draw(BankUpGlyph());  
+  _ppScreens[SCREEN_THREE]->draw(ArrowGlyph(ARROW_UP));  
   _ppScreens[SCREEN_FOUR]->draw(ModeGlyph(modeLines, 2));  
 
   _lightManager.turnAllOff();
@@ -85,24 +84,12 @@ byte BankMode::getBank() const
 
 //////////////////////////////////
 // Normal Mode
-NormalMode::NormalMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens, const BankMode& bankMode) :
+NormalMode::NormalMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens, const BankMode& bankMode) :
   _midi(midi),
   _lightManager(lightManager),
   _ppScreens(ppScreens),
   _bankMode(bankMode),
   _activeButton(0)
-{
-}
-
-NormalMode::NormalMode()
-{
-}
-
-NormalMode::NormalMode(const NormalMode& rhs) :
-  _midi(rhs._midi),
-  _lightManager(rhs._lightManager),
-  _bankMode(rhs._bankMode),
-  _activeButton(rhs._activeButton)
 {
 }
 
@@ -146,13 +133,6 @@ ModeManager::ModeManager(IMode** ppModes, const byte nModes) :
   _ppModes(ppModes),
   _nModes(nModes),
   _currentMode(0)
-{
-}
-
-ModeManager::ModeManager(const ModeManager& rhs):
-  _ppModes(rhs._ppModes),
-  _nModes(rhs._nModes),
-  _currentMode(rhs._currentMode)
 {
 }
 

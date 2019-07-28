@@ -9,20 +9,6 @@ LightManager::LightManager(Light** ppLights, const byte nLights) :
 {
 }
 
-LightManager::LightManager() :
-  _ppLights(0),
-  _nLights(0),
-  _chrono(0)
-{
-}
-
-LightManager::LightManager(const LightManager& rhs) :
-  _ppLights(rhs._ppLights),
-  _nLights(rhs._nLights),
-  _chrono(rhs._chrono)
-{
-}
-
 void LightManager::turnOn(const byte number, const bool on) const
 {
   if (on)

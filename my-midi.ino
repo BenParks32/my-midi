@@ -29,8 +29,8 @@ BankMode bankMode(MIDI, lightManager, screens);
 NormalMode normalMode(MIDI, lightManager, screens, bankMode);
 IMode *modes[MODE_COUNT] {&normalMode, &bankMode};
 
-const ModeManager modeManager(modes, MODE_COUNT);
-const ButtonHandler buttonHandler(modeManager);
+ModeManager modeManager(modes, MODE_COUNT);
+ButtonHandler buttonHandler(modeManager);
 
 Button btn1(1, 2, buttonHandler);
 Button btn2(2, 4, buttonHandler);
@@ -38,18 +38,18 @@ Button btn3(3, 6, buttonHandler);
 Button btn4(4, 8, modeManager);
 Button *buttons[BUTTON_COUNT] {&btn1, &btn2, &btn3, &btn4};
 
-void setup() {    
-  for(int i=0; i < BUTTON_COUNT; ++i)
+void setup() {
+  for (int i = 0; i < BUTTON_COUNT; ++i)
   {
     screens[i]->setup();
   }
-  normalMode.activate();
   MIDI.begin(MIDI_CHANNEL_OFF);
+  normalMode.activate();
 }
 
 void loop() {
- 
-  for(int i=0; i < BUTTON_COUNT; ++i)
+
+  for (int i = 0; i < BUTTON_COUNT; ++i)
   {
     buttons[i]->updateState();
   }

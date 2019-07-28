@@ -15,7 +15,7 @@ enum ButtonState {IS_OPEN, IS_RISING, IS_CLOSED, IS_FALLING};
 class Button
 {
   public:
-    Button(const byte number, const byte pin, const IButtonDelegate& delegate);
+    Button(const byte number, const byte pin, IButtonDelegate& delegate);
 
   private:
     Button();
@@ -25,10 +25,10 @@ class Button
     void updateState();
 
   private:
-    const Bounce _debouncer;
+    Bounce _debouncer;
     const byte _number;
     const byte _pin;
-    const IButtonDelegate& _delegate;
+    IButtonDelegate& _delegate;
     ButtonState _state;
 };
 

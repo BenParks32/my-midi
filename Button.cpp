@@ -1,14 +1,6 @@
 #include "Button.h"
 
-Button::Button()
-{
-}
-
-Button::Button(const Button& rhs)
-{
-}
-
-Button::Button(const byte number, const byte pin, const IButtonDelegate& delegate) :
+Button::Button(const byte number, const byte pin, IButtonDelegate& delegate) :
   _debouncer(Bounce()),
   _number(number),
   _pin(pin),

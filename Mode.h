@@ -19,7 +19,7 @@ class IMode
 class BankMode : public IMode
 {
   public:
-    BankMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens);
+    BankMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens);
 
   private:
     BankMode();
@@ -32,16 +32,16 @@ class BankMode : public IMode
     byte getBank() const;
 
   private:
-    const midi_t& _midi;
+    midi_t& _midi;
     const LightManager& _lightManager;
-    const Screen** _ppScreens;
+    Screen** _ppScreens;
     byte _activeBank;
 };
 
 class NormalMode : public IMode
 {
   public:
-    NormalMode(const midi_t& midi, const LightManager& lightManager, const Screen** ppScreens, const BankMode& bankMode);
+    NormalMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens, const BankMode& bankMode);
 
   private:
     NormalMode();
@@ -55,9 +55,9 @@ class NormalMode : public IMode
     void sendMidi() const;
 
   private:
-    const midi_t& _midi;
+    midi_t& _midi;
     const LightManager& _lightManager;
-    const Screen** _ppScreens;
+    Screen** _ppScreens;
     const BankMode& _bankMode;
     byte _activeButton;
 };

@@ -14,7 +14,7 @@ TextGlyph::TextGlyph(const char* txt, const uint8_t* font, const XY& pos) :
 {
 }
 
-void TextGlyph::draw(const screen_t& ctx) const
+void TextGlyph::draw(const screen_t& ctx)
 {
   ctx.firstPage();
   ctx.setFont(_font);
@@ -25,9 +25,6 @@ void TextGlyph::draw(const screen_t& ctx) const
 //////////////////////////////////
 // Text based glyphs
 PatchGlyph::PatchGlyph(const char* letter) : TextGlyph(letter, u8g2_font_logisoso58_tr, XY(44, 62)) {}
-BankGlyph::BankGlyph(const char* arrow) : TextGlyph(arrow, u8g2_font_open_iconic_arrow_8x_t, XY(32, 70)) {}
-BankUpGlyph::BankUpGlyph() : BankGlyph("S") {}
-BankDownGlyph::BankDownGlyph() : BankGlyph("P") {}
 //////////////////////////////////
 // BankNumberGlyph
 BankNumberGlyph::BankNumberGlyph(const byte bank) :
@@ -35,20 +32,52 @@ BankNumberGlyph::BankNumberGlyph(const byte bank) :
 {
 }
 
-void BankNumberGlyph::draw(const screen_t& ctx) const
+void BankNumberGlyph::draw(const screen_t& ctx)
 {
   const char ZERO = 48;
   const char num[3] {ZERO + (_bank / 10), ZERO + (_bank % 10), 0};
 
   ctx.firstPage();
   do {
+
     ctx.setFont(u8g2_font_logisoso20_tr);
     ctx.drawStr(40, 22, "Bank");
     ctx.setFont(u8g2_font_logisoso38_tn);
     ctx.drawStr(41, 63, num);
+
   } while ( ctx.nextPage() );
 }
+//////////////////////////////////
+// ArrowUpGlyph
+ArrowGlyph::ArrowGlyph(const ARROW_TYPE type) :
+  _type(type)
+{
+}
 
+void ArrowGlyph::draw(const screen_t& ctx)
+{
+  const XY pos(42, 10);
+  const SZ sz(42, 32);
+  const byte w2 = sz.w / 2;
+  const byte w4 = sz.w / 4;
+  const byte bh = 10;
+
+  ctx.firstPage();
+  do {
+    switch (_type)
+    {
+      case ARROW_DOWN:
+        ctx.drawTriangle(pos.x, pos.y + bh, pos.x + sz.w, pos.y + bh, pos.x + w2, pos.y + sz.h + bh);
+        ctx.drawBox(pos.x + w4, pos.y, w2 + 2, bh);
+        break;
+
+      case ARROW_UP:
+        ctx.drawTriangle(pos.x + w2, pos.y, pos.x, pos.y + sz.h, pos.x + sz.w, pos.y + sz.h);
+        ctx.drawBox(pos.x + w4, pos.y + sz.h, w2 + 2, bh);
+        break;
+    }
+  } while ( ctx.nextPage() );
+}
 //////////////////////////////////
 // ModeGlyph
 ModeGlyph::ModeGlyph(const char** pLines, const byte numLines) :
@@ -57,7 +86,7 @@ ModeGlyph::ModeGlyph(const char** pLines, const byte numLines) :
 {
 }
 
-void ModeGlyph::draw(const screen_t& ctx) const
+void ModeGlyph::draw(const screen_t& ctx)
 {
   const byte screenHeight = 64;
   const byte lineHeight = 25;
@@ -82,18 +111,18 @@ Screen::Screen(const byte pin) :
 {
 }
 
-void Screen::setup() const
+void Screen::setup()
 {
   pinMode(_pin, OUTPUT);
   _u8g2.begin();
 }
 
-void Screen::draw(const IGlyph& glyph) const
+void Screen::draw(const IGlyph & glyph)
 {
   glyph.draw(_u8g2);
 }
 
-void Screen::clear() const
+void Screen::clear()
 {
   _u8g2.clearDisplay();
 }
