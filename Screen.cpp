@@ -24,7 +24,7 @@ void TextGlyph::draw(screen_t& ctx)
 }
 //////////////////////////////////
 // Text based glyphs
-PatchGlyph::PatchGlyph(const char* letter) : TextGlyph(letter, u8g2_font_logisoso58_tr, XY(44, 62)) {}
+PatchGlyph::PatchGlyph(const char* letter) : TextGlyph(letter, u8g2_font_logisoso38_tr, XY(44, 62)) {}
 //////////////////////////////////
 // BankNumberGlyph
 BankNumberGlyph::BankNumberGlyph(const byte bank) :
@@ -34,16 +34,17 @@ BankNumberGlyph::BankNumberGlyph(const byte bank) :
 
 void BankNumberGlyph::draw(screen_t& ctx)
 {
-  const char ZERO = 48;
-  const char BASE = 10;
-  const char num[3] {ZERO + (_bank / BASE), ZERO + (_bank % BASE), (char)0};
+  const char ZERO = 48;  
+  const char num1 = (char)(ZERO + (_bank / 10u));
+  const char num2 = (char)(ZERO + (_bank % 10u));
+  const char num[3] {num1, num2, 0u};
 
   ctx.firstPage();
   do {
 
     ctx.setFont(u8g2_font_logisoso20_tr);
-    ctx.drawStr(40, 22, "Bank");
-    ctx.setFont(u8g2_font_logisoso38_tn);
+    ctx.drawStr(40, 22, "Banks");
+    ctx.setFont(u8g2_font_logisoso38_tr);
     ctx.drawStr(41, 63, num);
 
   } while ( ctx.nextPage() );

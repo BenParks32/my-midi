@@ -6,7 +6,9 @@
                 "H:\\Development\\Tools\\arduino-1.8.9\\tools\\**",
                 "H:\\Development\\Tools\\arduino-1.8.9\\hardware\\arduino\\avr\\**",
                 "${workspaceFolder}/**",
-                "D:\\Documents\\Ben's Documents\\Arduino\\libraries\\**"
+                "D:\\Documents\\Ben's Documents\\Arduino\\libraries\\**",
+                "H:\\Development\\Tools\\arduino\\arduino-1.8.5\\hardware\\arduino\\avr\\**",
+                "H:\\Development\\Tools\\arduino\\arduino-1.8.5\\tools\\**"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,7 +17,8 @@
             ],
             "intelliSenseMode": "clang-x64",
             "forcedInclude": [
-                "H:\\Development\\Tools\\arduino-1.8.9\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+                "H:\\Development\\Tools\\arduino-1.8.9\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h",
+                "H:\\Development\\Tools\\arduino\\arduino-1.8.5\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ]
         }
     ],
