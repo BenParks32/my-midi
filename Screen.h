@@ -26,7 +26,7 @@ struct SZ
 class IGlyph
 {
   public:
-    virtual void draw(const screen_t& ctx) = 0;
+    virtual void draw(screen_t& ctx) = 0;
 };
 
 class TextGlyph : public IGlyph
@@ -39,7 +39,7 @@ class TextGlyph : public IGlyph
     TextGlyph(const TextGlyph& rhs);
 
   public:
-    virtual void draw(const screen_t& ctx);
+    virtual void draw(screen_t& ctx);
 
   private:
     const char* _txt;
@@ -59,7 +59,7 @@ class BankNumberGlyph : public IGlyph
     BankNumberGlyph(const byte bank);
 
   public:
-    virtual void draw(const screen_t& ctx);
+    virtual void draw(screen_t& ctx);
 
   private:
     byte _bank;
@@ -71,7 +71,7 @@ class ArrowGlyph : public IGlyph
     ArrowGlyph(const ARROW_TYPE type);
 
   public:
-    virtual void draw(const screen_t& ctx);
+    virtual void draw(screen_t& ctx);
 
   private:
     const ARROW_TYPE _type;
@@ -84,7 +84,7 @@ class ModeGlyph : public IGlyph
     ModeGlyph(const char** pLines, const byte numLines);
 
   public:
-    virtual void draw(const screen_t& ctx);
+    virtual void draw(screen_t& ctx);
 
   private:
     const char** _pLines;
@@ -102,11 +102,11 @@ class Screen
 
   public:
     void setup();
-    void draw(const IGlyph& glyph);
+    void draw(IGlyph& glyph);
     void clear();
 
   private:
-    const screen_t _u8g2;
+    screen_t _u8g2;
     const byte _pin;
 };
 

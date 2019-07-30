@@ -14,7 +14,7 @@ TextGlyph::TextGlyph(const char* txt, const uint8_t* font, const XY& pos) :
 {
 }
 
-void TextGlyph::draw(const screen_t& ctx)
+void TextGlyph::draw(screen_t& ctx)
 {
   ctx.firstPage();
   ctx.setFont(_font);
@@ -32,10 +32,11 @@ BankNumberGlyph::BankNumberGlyph(const byte bank) :
 {
 }
 
-void BankNumberGlyph::draw(const screen_t& ctx)
+void BankNumberGlyph::draw(screen_t& ctx)
 {
   const char ZERO = 48;
-  const char num[3] {ZERO + (_bank / 10), ZERO + (_bank % 10), 0};
+  const char BASE = 10;
+  const char num[3] {ZERO + (_bank / BASE), ZERO + (_bank % BASE), (char)0};
 
   ctx.firstPage();
   do {
@@ -54,7 +55,7 @@ ArrowGlyph::ArrowGlyph(const ARROW_TYPE type) :
 {
 }
 
-void ArrowGlyph::draw(const screen_t& ctx)
+void ArrowGlyph::draw(screen_t& ctx)
 {
   const XY pos(42, 10);
   const SZ sz(42, 32);
@@ -86,7 +87,7 @@ ModeGlyph::ModeGlyph(const char** pLines, const byte numLines) :
 {
 }
 
-void ModeGlyph::draw(const screen_t& ctx)
+void ModeGlyph::draw(screen_t& ctx)
 {
   const byte screenHeight = 64;
   const byte lineHeight = 25;
@@ -117,7 +118,7 @@ void Screen::setup()
   _u8g2.begin();
 }
 
-void Screen::draw(const IGlyph & glyph)
+void Screen::draw(IGlyph & glyph)
 {
   glyph.draw(_u8g2);
 }

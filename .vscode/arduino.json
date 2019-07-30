@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "my-midi.ino",
+    "port": "COM3",
+	"output": "../ArduinoOutput"
+}

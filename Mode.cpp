@@ -37,11 +37,17 @@ BankMode::BankMode(midi_t& midi, const LightManager& lightManager, Screen** ppSc
 
 void BankMode::activate()
 {
+  ArrowGlyph arrowDown(ARROW_DOWN);
+  ArrowGlyph arrowUp(ARROW_DOWN);
+  BankNumberGlyph bankNumber(_activeBank);
+
   const char* modeLines[2] = { "Select","Bank" };
-  _ppScreens[SCREEN_ONE]->draw(ArrowGlyph(ARROW_DOWN));
-  _ppScreens[SCREEN_TWO]->draw(BankNumberGlyph(_activeBank));
-  _ppScreens[SCREEN_THREE]->draw(ArrowGlyph(ARROW_UP));  
-  _ppScreens[SCREEN_FOUR]->draw(ModeGlyph(modeLines, 2));  
+  ModeGlyph mode(modeLines, 2);
+
+  _ppScreens[SCREEN_ONE]->draw(arrowDown);
+  _ppScreens[SCREEN_TWO]->draw(bankNumber);
+  _ppScreens[SCREEN_THREE]->draw(arrowUp);  
+  _ppScreens[SCREEN_FOUR]->draw(mode);  
 
   _lightManager.turnAllOff();
   _lightManager.turnOn(LIGHT_ONE);  
@@ -73,7 +79,8 @@ void BankMode::buttonPressed(const byte number)
       break;
   }
 
-  _ppScreens[SCREEN_TWO]->draw(BankNumberGlyph(_activeBank));
+  BankNumberGlyph bankNumber(_activeBank);
+  _ppScreens[SCREEN_TWO]->draw(bankNumber);
   _midi.sendProgramChange(_activeBank, STOMP_MIDI_CHANNEL);
 }
 
@@ -95,10 +102,15 @@ NormalMode::NormalMode(midi_t& midi, const LightManager& lightManager, Screen** 
 
 void NormalMode::activate()
 {
-  _ppScreens[SCREEN_ONE]->draw(PatchGlyph("A"));
-  _ppScreens[SCREEN_TWO]->draw(PatchGlyph("B"));
-  _ppScreens[SCREEN_THREE]->draw(PatchGlyph("C"));
-  _ppScreens[SCREEN_FOUR]->draw(BankNumberGlyph(_bankMode.getBank()));
+  PatchGlyph patchA("A");
+  PatchGlyph patchB("B");
+  PatchGlyph patchC("C");
+  BankNumberGlyph bankNumber(_bankMode.getBank());
+
+  _ppScreens[SCREEN_ONE]->draw(patchA);
+  _ppScreens[SCREEN_TWO]->draw(patchB);
+  _ppScreens[SCREEN_THREE]->draw(patchC);
+  _ppScreens[SCREEN_FOUR]->draw(bankNumber);
     
   _lightManager.setFlashing(LIGHT_FOUR, false);
   
