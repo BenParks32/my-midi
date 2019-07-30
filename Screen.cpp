@@ -7,24 +7,27 @@ const byte DC = 10;
 
 //////////////////////////////////
 // TextGlyph
-TextGlyph::TextGlyph(const char* txt, const uint8_t* font, const XY& pos) :
+PatchGlyph::PatchGlyph(const char* txt, bool active) :
   _txt(txt),
-  _font(font),
-  _pos(pos)
+  _active(active)
 {
 }
 
-void TextGlyph::draw(screen_t& ctx)
+void PatchGlyph::draw(screen_t& ctx)
 {
+  XY pos(47, 57);
+
   ctx.firstPage();
-  ctx.setFont(_font);
+  ctx.setFont(u8g2_font_logisoso50_tr);
   do {
-    ctx.drawStr(_pos.x, _pos.y, _txt);
+    ctx.drawStr(pos.x, pos.y, _txt);
+    if(_active)
+    {
+      ctx.drawFrame(34, 0, 60, 64);
+      ctx.drawFrame(35, 1, 58, 62);
+    }
   } while ( ctx.nextPage() );
 }
-//////////////////////////////////
-// Text based glyphs
-PatchGlyph::PatchGlyph(const char* letter) : TextGlyph(letter, u8g2_font_logisoso38_tr, XY(44, 62)) {}
 //////////////////////////////////
 // BankNumberGlyph
 BankNumberGlyph::BankNumberGlyph(const byte bank) :
@@ -43,7 +46,7 @@ void BankNumberGlyph::draw(screen_t& ctx)
   do {
 
     ctx.setFont(u8g2_font_logisoso20_tr);
-    ctx.drawStr(40, 22, "Banks");
+    ctx.drawStr(40, 22, "Bank");
     ctx.setFont(u8g2_font_logisoso38_tr);
     ctx.drawStr(41, 63, num);
 

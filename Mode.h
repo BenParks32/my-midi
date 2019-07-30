@@ -52,7 +52,8 @@ class NormalMode : public IMode
     virtual void buttonPressed(const byte number);
 
   private:
-    void sendMidi() const;
+    void sendMidi() const;    
+    void updateScreen(const byte number, bool active);
 
   private:
     midi_t& _midi;

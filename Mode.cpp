@@ -38,7 +38,7 @@ BankMode::BankMode(midi_t& midi, const LightManager& lightManager, Screen** ppSc
 void BankMode::activate()
 {
   ArrowGlyph arrowDown(ARROW_DOWN);
-  ArrowGlyph arrowUp(ARROW_DOWN);
+  ArrowGlyph arrowUp(ARROW_UP);
   BankNumberGlyph bankNumber(_activeBank);
 
   const char* modeLines[2] = { "Select","Bank" };
@@ -102,9 +102,9 @@ NormalMode::NormalMode(midi_t& midi, const LightManager& lightManager, Screen** 
 
 void NormalMode::activate()
 {
-  PatchGlyph patchA("A");
-  PatchGlyph patchB("B");
-  PatchGlyph patchC("C");
+  PatchGlyph patchA("A", _activeButton == BUTTON_ONE-1);
+  PatchGlyph patchB("B", _activeButton == BUTTON_TWO-1);
+  PatchGlyph patchC("C", _activeButton == BUTTON_THREE-1);
   BankNumberGlyph bankNumber(_bankMode.getBank());
 
   _ppScreens[SCREEN_ONE]->draw(patchA);
@@ -120,11 +120,23 @@ void NormalMode::activate()
   sendMidi();
 }
 
+void NormalMode::updateScreen(const byte number, const bool active)
+{
+  const char A = 'A';
+  const char txt[2] = {(char)(A+number), 0u};
+  PatchGlyph patch(txt, active);
+  _ppScreens[number]->draw(patch);
+}
+
 void NormalMode::buttonPressed(const byte number)
 {
   _lightManager.turnOff(_activeButton);
+  updateScreen(_activeButton, false);
+
   _activeButton = number - 1;
+
   _lightManager.turnOn(_activeButton);
+  updateScreen(_activeButton, true);
   sendMidi();  
 }
 

@@ -29,28 +29,21 @@ class IGlyph
     virtual void draw(screen_t& ctx) = 0;
 };
 
-class TextGlyph : public IGlyph
+class PatchGlyph : public IGlyph
 {
   public:
-    TextGlyph(const char* txt, const uint8_t* font, const XY& pos);
+    PatchGlyph(const char* txt, const bool active);
 
   private:
-    TextGlyph();
-    TextGlyph(const TextGlyph& rhs);
+    PatchGlyph();
+    PatchGlyph(const PatchGlyph& rhs);
 
   public:
     virtual void draw(screen_t& ctx);
 
   private:
     const char* _txt;
-    const uint8_t* _font;
-    const XY _pos;
-};
-
-class PatchGlyph : public TextGlyph
-{
-  public:
-    PatchGlyph(const char* letter);
+    const bool _active;
 };
 
 class BankNumberGlyph : public IGlyph
