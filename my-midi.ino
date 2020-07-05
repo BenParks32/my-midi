@@ -32,7 +32,7 @@ IMode *modes[MODE_COUNT] {&normalMode, &bankMode};
 ModeManager modeManager(modes, MODE_COUNT);
 ButtonHandler buttonHandler(modeManager);
 
-Button btn1(1, 2, buttonHandler);
+Button btn1(1, 12, buttonHandler); // using 12 as 2 seems to be broken!
 Button btn2(2, 4, buttonHandler);
 Button btn3(3, 6, buttonHandler);
 Button btn4(4, 8, modeManager);
