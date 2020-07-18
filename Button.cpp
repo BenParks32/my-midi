@@ -24,9 +24,8 @@ void Button::updateState()
   {
     case IS_OPEN:
     {  
-      if (millis() - _chrono > 1000) 
+      if (millis() - _chrono > 750) 
       {
-        Serial.println("long pressed");
       	_delegate.buttonLongPressed(_number);        
         _longPressed = true;
       }
@@ -34,15 +33,21 @@ void Button::updateState()
       if (pinIs == HIGH)
       {
         _state = IS_RISING;
-      }
-      Serial.println("open");
+      }      
     } break;
 
     case IS_RISING:
     {
       _state = IS_CLOSED;
-      _chrono = millis(); 
-      Serial.println("closing");
+
+      if(!_longPressed)      
+      {
+        _delegate.buttonPressed(_number);
+      }
+
+      _longPressed = false;
+      _chrono = 0;
+      
     } break;
 
     case IS_CLOSED:
@@ -51,23 +56,12 @@ void Button::updateState()
       {
         _state = IS_FALLING;
       }
-      Serial.println("closed");
     } break;
 
     case IS_FALLING:
     {     
-      if(!_longPressed)      
-      {
-        Serial.println("long pressed");
-        _delegate.buttonPressed(_number);
-      }
-
-      _longPressed = false;
-      _chrono = 0;
+      _chrono = millis(); 
       _state = IS_OPEN;
-
-      Serial.println("opening");
-
     } break;
   }
 }

@@ -44,8 +44,7 @@ void setup() {
   {
     screens[i]->setup();
   }
-  // MIDI.begin(MIDI_CHANNEL_OFF);
-  Serial.begin(9600);
+  MIDI.begin(MIDI_CHANNEL_OFF);  
   normalMode.activate();  
 }
 
