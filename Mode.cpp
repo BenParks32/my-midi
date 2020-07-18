@@ -84,6 +84,10 @@ void BankMode::buttonPressed(const byte number)
   _midi.sendProgramChange(_activeBank, STOMP_MIDI_CHANNEL);
 }
 
+void BankMode::buttonLongPressed(const byte number)
+{
+}
+
 byte BankMode::getBank() const
 {
   return _activeBank;
@@ -140,6 +144,10 @@ void NormalMode::buttonPressed(const byte number)
   sendMidi();  
 }
 
+void NormalMode::buttonLongPressed(const byte number)
+{
+}
+
 void NormalMode::sendMidi() const
 {
   // send the snap shot change to the stomp
@@ -149,6 +157,59 @@ void NormalMode::sendMidi() const
   const byte activeBank = _bankMode.getBank();
   byte patch = (activeBank * 3) + _activeButton;
   _midi.sendProgramChange(patch, AMP_MIDI_CHANNEL);
+}
+
+//////////////////////////////////
+// Looper Mode
+LooperMode::LooperMode(const LightManager& lightManager, Screen** ppScreens) :
+  _lightManager(lightManager),
+  _ppScreens(ppScreens),
+  _activeButton(0)
+{
+}
+
+void LooperMode::activate()
+{
+  PatchGlyph patchA("R", _activeButton == BUTTON_ONE-1);
+  PatchGlyph patchB("S", _activeButton == BUTTON_TWO-1);
+  PatchGlyph patchC("P", _activeButton == BUTTON_THREE-1);
+
+  const char* modeLines[2] = { "Looper", "Mode" };
+  ModeGlyph mode(modeLines, 2);
+
+  _ppScreens[SCREEN_ONE]->draw(patchA);
+  _ppScreens[SCREEN_TWO]->draw(patchB);
+  _ppScreens[SCREEN_THREE]->draw(patchC);
+  _ppScreens[SCREEN_FOUR]->draw(mode);
+    
+  _lightManager.setFlashing(LIGHT_FOUR, false);
+  
+  _lightManager.turnAllOff();
+  _lightManager.turnOn(_activeButton);  
+  _lightManager.turnOn(LIGHT_FOUR);
+  }
+
+void LooperMode::updateScreen(const byte number, const bool active)
+{
+  const char A = 'A';
+  const char txt[2] = {(char)(A+number), 0u};
+  PatchGlyph patch(txt, active);
+  _ppScreens[number]->draw(patch);
+}
+
+void LooperMode::buttonPressed(const byte number)
+{
+  _lightManager.turnOff(_activeButton);
+  updateScreen(_activeButton, false);
+
+  _activeButton = number - 1;
+
+  _lightManager.turnOn(_activeButton);
+  updateScreen(_activeButton, true);  
+}
+
+void LooperMode::buttonLongPressed(const byte number)
+{
 }
 
 //////////////////////////////////
@@ -172,5 +233,11 @@ void ModeManager::buttonPressed(const byte number)
   else
     _currentMode = 0;
     
+  _ppModes[_currentMode]->activate();  
+}
+
+void ModeManager::buttonLongPressed(const byte number)
+{
+  _currentMode = 2;
   _ppModes[_currentMode]->activate();  
 }

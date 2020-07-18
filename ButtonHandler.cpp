@@ -12,3 +12,9 @@ void ButtonHandler::buttonPressed(const byte number)
   IMode& mode = _modeManager.getMode();
   mode.buttonPressed(number);
 }
+
+void ButtonHandler::buttonLongPressed(const byte number)
+{
+  IMode& mode = _modeManager.getMode();
+  mode.buttonLongPressed(number);
+}

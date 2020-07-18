@@ -5,7 +5,10 @@ Button::Button(const byte number, const byte pin, IButtonDelegate& delegate) :
   _number(number),
   _pin(pin),
   _delegate(delegate),
-  _state(IS_OPEN)
+  _state(IS_CLOSED),
+  _chrono(0),
+  _longPressing(false),
+  _longPressed(false)
 {
   pinMode(_pin, INPUT_PULLUP);
   _debouncer.attach(_pin);
@@ -20,22 +23,51 @@ void Button::updateState()
   switch (_state)
   {
     case IS_OPEN:
+    {  
+      if (millis() - _chrono > 1000) 
+      {
+        Serial.println("long pressed");
+      	_delegate.buttonLongPressed(_number);        
+        _longPressed = true;
+      }
+
       if (pinIs == HIGH)
+      {
         _state = IS_RISING;
-      break;
+      }
+      Serial.println("open");
+    } break;
 
     case IS_RISING:
+    {
       _state = IS_CLOSED;
-      break;
+      _chrono = millis(); 
+      Serial.println("closing");
+    } break;
 
     case IS_CLOSED:
+    {
       if (pinIs == LOW)
+      {
         _state = IS_FALLING;
-      break;
+      }
+      Serial.println("closed");
+    } break;
 
     case IS_FALLING:
-      _delegate.buttonPressed(_number);
+    {     
+      if(!_longPressed)      
+      {
+        Serial.println("long pressed");
+        _delegate.buttonPressed(_number);
+      }
+
+      _longPressed = false;
+      _chrono = 0;
       _state = IS_OPEN;
-      break;
+
+      Serial.println("opening");
+
+    } break;
   }
 }

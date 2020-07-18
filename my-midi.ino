@@ -7,7 +7,7 @@
 #include "LightManager.h"
 #include "Screen.h"
 
-const byte MODE_COUNT = 2;
+const byte MODE_COUNT = 3;
 const byte BUTTON_COUNT = 4;
 
 MIDI_CREATE_DEFAULT_INSTANCE();
@@ -27,7 +27,8 @@ Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr3, &scr4};
 
 BankMode bankMode(MIDI, lightManager, screens);
 NormalMode normalMode(MIDI, lightManager, screens, bankMode);
-IMode *modes[MODE_COUNT] {&normalMode, &bankMode};
+LooperMode looperMode(lightManager, screens);
+IMode *modes[MODE_COUNT] {&normalMode, &bankMode, &looperMode};
 
 ModeManager modeManager(modes, MODE_COUNT);
 ButtonHandler buttonHandler(modeManager);
@@ -43,8 +44,9 @@ void setup() {
   {
     screens[i]->setup();
   }
-  MIDI.begin(MIDI_CHANNEL_OFF);
-  normalMode.activate();
+  // MIDI.begin(MIDI_CHANNEL_OFF);
+  Serial.begin(9600);
+  normalMode.activate();  
 }
 
 void loop() {

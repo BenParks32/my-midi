@@ -14,6 +14,7 @@ class IMode
   public:
     virtual void activate() = 0;
     virtual void buttonPressed(const byte number) = 0;
+    virtual void buttonLongPressed(const byte number) = 0;
 };
 
 class BankMode : public IMode
@@ -28,6 +29,7 @@ class BankMode : public IMode
   public:
     virtual void activate();
     virtual void buttonPressed(const byte number);
+    virtual void buttonLongPressed(const byte number);
 
     byte getBank() const;
 
@@ -50,6 +52,7 @@ class NormalMode : public IMode
   public:
     virtual void activate();
     virtual void buttonPressed(const byte number);
+    virtual void buttonLongPressed(const byte number);
 
   private:
     void sendMidi() const;    
@@ -60,6 +63,29 @@ class NormalMode : public IMode
     const LightManager& _lightManager;
     Screen** _ppScreens;
     const BankMode& _bankMode;
+    byte _activeButton;
+};
+
+class LooperMode : public IMode
+{
+  public:
+    LooperMode(const LightManager& lightManager, Screen** ppScreens);
+
+  private:
+    LooperMode();
+    LooperMode(const LooperMode& rhs);
+
+  public:
+    virtual void activate();
+    virtual void buttonPressed(const byte number);
+    virtual void buttonLongPressed(const byte number);
+
+  private:
+    void updateScreen(const byte number, bool active);
+
+  private:
+    const LightManager& _lightManager;
+    Screen** _ppScreens;
     byte _activeButton;
 };
 
@@ -74,6 +100,7 @@ class ModeManager : public IButtonDelegate
 
   public:
     virtual void buttonPressed(const byte number);
+    virtual void buttonLongPressed(const byte number);
     IMode& getMode() const;
 
   private:

@@ -8,6 +8,7 @@ class IButtonDelegate
 {
   public:
     virtual void buttonPressed(const byte number) = 0;
+    virtual void buttonLongPressed(const byte number) = 0;
 };
 
 enum ButtonState {IS_OPEN, IS_RISING, IS_CLOSED, IS_FALLING};
@@ -30,6 +31,9 @@ class Button
     const byte _pin;
     IButtonDelegate& _delegate;
     ButtonState _state;
+    long _chrono;
+    bool _longPressing;
+    bool _longPressed;
 };
 
 #endif
