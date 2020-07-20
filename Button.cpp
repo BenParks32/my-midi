@@ -24,7 +24,7 @@ void Button::updateState()
   {
     case IS_OPEN:
     {  
-      if (millis() - _chrono > 750) 
+      if (!_longPressed && millis() - _chrono > 750) 
       {
       	_delegate.buttonLongPressed(_number);        
         _longPressed = true;

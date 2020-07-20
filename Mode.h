@@ -9,6 +9,8 @@
 
 typedef midi::MidiInterface<HardwareSerial> midi_t;
 
+enum LooperState {NO_LOOP, STOPPED, RECORDING, PLAYING, OVER_DUBBING};
+
 class IMode
 {
   public:
@@ -69,7 +71,7 @@ class NormalMode : public IMode
 class LooperMode : public IMode
 {
   public:
-    LooperMode(const LightManager& lightManager, Screen** ppScreens);
+    LooperMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens);
 
   private:
     LooperMode();
@@ -81,12 +83,20 @@ class LooperMode : public IMode
     virtual void buttonLongPressed(const byte number);
 
   private:
-    void updateScreen(const byte number, bool active);
+    LooperState play();
+    LooperState stop();
+    LooperState longStop();
+    LooperState record();
+    LooperState longRecord();
+    void updateState();
+    void updateMode(const char* line);    
 
   private:
+    midi_t& _midi;
     const LightManager& _lightManager;
     Screen** _ppScreens;
-    byte _activeButton;
+    LooperState _state;
+    LoopGlyph _loopGlyph;
 };
 
 class ModeManager : public IButtonDelegate

@@ -31,7 +31,7 @@ void PatchGlyph::draw(screen_t& ctx)
 //////////////////////////////////
 // BankNumberGlyph
 BankNumberGlyph::BankNumberGlyph(const byte bank) :
-  _bank(bank + 1)
+  _bank(bank)
 {
 }
 
@@ -53,36 +53,78 @@ void BankNumberGlyph::draw(screen_t& ctx)
   } while ( ctx.nextPage() );
 }
 //////////////////////////////////
-// ArrowUpGlyph
-ArrowGlyph::ArrowGlyph(const ARROW_TYPE type) :
+// SymbolGlyph
+SymbolGlyph::SymbolGlyph(const SYMBOL_TYPE type) :
   _type(type)
 {
 }
 
-void ArrowGlyph::draw(screen_t& ctx)
+void SymbolGlyph::draw(screen_t& ctx)
 {
   const XY pos(42, 10);
-  const SZ sz(42, 32);
-  const byte w2 = sz.w / 2;
-  const byte w4 = sz.w / 4;
-  const byte bh = 10;
+  const SZ sz(42, 42);
 
   ctx.firstPage();
   do {
     switch (_type)
     {
       case ARROW_DOWN:
-        ctx.drawTriangle(pos.x, pos.y + bh, pos.x + sz.w, pos.y + bh, pos.x + w2, pos.y + sz.h + bh);
-        ctx.drawBox(pos.x + w4, pos.y, w2 + 2, bh);
+      case ARROW_UP:
+        this->drawArrow(ctx, pos, sz);
         break;
 
-      case ARROW_UP:
-        ctx.drawTriangle(pos.x + w2, pos.y, pos.x, pos.y + sz.h, pos.x + sz.w, pos.y + sz.h);
-        ctx.drawBox(pos.x + w4, pos.y + sz.h, w2 + 2, bh);
+      case PLAY:
+        this->drawPlay(ctx, pos, sz);
         break;
+
+      case STOP:
+        this->drawStop(ctx, pos, sz);
+        break;        
+ 
+      case RECORD:
+        this->drawRecord(ctx, pos, sz);
+        break;        
     }
   } while ( ctx.nextPage() );
 }
+
+void SymbolGlyph::drawArrow(screen_t& ctx, const XY& pos, const SZ& sz)
+{
+  const byte w2 = sz.w / 2;
+  const byte w4 = sz.w / 4;
+  const byte bh = 10;
+
+  switch (_type)
+    {
+      case ARROW_DOWN:
+        ctx.drawTriangle(pos.x + w2, pos.y, pos.x, pos.y + sz.h - bh, pos.x + sz.w, pos.y + sz.h - bh);
+        ctx.drawBox(pos.x + w4, pos.y + sz.h - bh, w2 + 2, bh);
+        break;
+
+      case ARROW_UP:
+        ctx.drawTriangle(pos.x, pos.y + bh, pos.x + sz.w, pos.y + bh, pos.x + w2, pos.y + sz.h);
+        ctx.drawBox(pos.x + w4, pos.y, w2 + 2, bh);
+        break;
+    }
+}
+
+void SymbolGlyph::drawPlay(screen_t& ctx,  const XY& pos, const SZ& sz)
+{
+  const byte h2 = sz.h / 2;
+  ctx.drawTriangle(pos.x, pos.y, pos.x + sz.w, pos.y + h2, pos.x, pos.y + sz.h);
+}
+
+void SymbolGlyph::drawStop(screen_t& ctx,  const XY& pos, const SZ& sz)
+{
+  ctx.drawBox(pos.x, pos.y, sz.w, sz.h);
+}
+
+void SymbolGlyph::drawRecord(screen_t& ctx,  const XY& pos, const SZ& sz)
+{
+  const byte rad = sz.w/2;
+  ctx.drawDisc(pos.x + rad, pos.y + rad, rad);
+}
+
 //////////////////////////////////
 // ModeGlyph
 ModeGlyph::ModeGlyph(const char** pLines, const byte numLines) :
@@ -105,6 +147,35 @@ void ModeGlyph::draw(screen_t& ctx)
     {
       ctx.drawStr(30, y + (line * lineHeight), _pLines[line]);
     }
+  } while ( ctx.nextPage() );
+}
+
+//////////////////////////////////
+// LoopGlyph
+LoopGlyph::LoopGlyph() :
+  _caption(NULL),
+  _length(0)
+{
+}
+
+void LoopGlyph::setTime(short newTime)
+{
+  _time = newTime;  
+}
+
+void LoopGlyph::setCaption(const char* caption)
+{
+  _caption = caption;
+}
+
+void LoopGlyph::draw(screen_t& ctx)
+{
+  ctx.firstPage();
+  ctx.setFont(u8g2_font_logisoso20_tr);
+
+  do {
+    ctx.drawStr(10, 25, _caption);
+    ctx.drawFrame(10, 35, 108, 25);
   } while ( ctx.nextPage() );
 }
 

@@ -27,7 +27,7 @@ Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr3, &scr4};
 
 BankMode bankMode(MIDI, lightManager, screens);
 NormalMode normalMode(MIDI, lightManager, screens, bankMode);
-LooperMode looperMode(lightManager, screens);
+LooperMode looperMode(MIDI, lightManager, screens);
 IMode *modes[MODE_COUNT] {&normalMode, &bankMode, &looperMode};
 
 ModeManager modeManager(modes, MODE_COUNT);

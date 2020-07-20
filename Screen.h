@@ -6,7 +6,7 @@
 
 typedef U8G2_SH1106_128X64_NONAME_1_4W_SW_SPI screen_t;
 
-enum ARROW_TYPE {ARROW_UP, ARROW_DOWN};
+enum SYMBOL_TYPE {ARROW_UP, ARROW_DOWN, PLAY, STOP, RECORD};
 
 struct XY
 {
@@ -58,17 +58,22 @@ class BankNumberGlyph : public IGlyph
     byte _bank;
 };
 
-class ArrowGlyph : public IGlyph
+class SymbolGlyph : public IGlyph
 {
   public:
-    ArrowGlyph(const ARROW_TYPE type);
+    SymbolGlyph(const SYMBOL_TYPE type);
 
   public:
     virtual void draw(screen_t& ctx);
 
   private:
-    const ARROW_TYPE _type;
+    void drawArrow(screen_t& ctx, const XY& pos, const SZ& sz);
+    void drawPlay(screen_t& ctx,  const XY& pos, const SZ& sz);
+    void drawStop(screen_t& ctx,  const XY& pos, const SZ& sz);
+    void drawRecord(screen_t& ctx,  const XY& pos, const SZ& sz);
 
+  private:
+    const SYMBOL_TYPE _type;
 };
 
 class ModeGlyph : public IGlyph
@@ -82,6 +87,22 @@ class ModeGlyph : public IGlyph
   private:
     const char** _pLines;
     const byte _numLines;
+};
+
+class LoopGlyph : public IGlyph
+{
+  public:
+    LoopGlyph();
+
+  public:
+    virtual void draw(screen_t& ctx);
+    void setCaption(const char* caption);
+    void setTime(short newTime);
+
+  private:
+    const char* _caption;
+    const short _length;
+    short _time;
 };
 
 class Screen
