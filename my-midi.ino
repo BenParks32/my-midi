@@ -44,6 +44,7 @@ void setup() {
   {
     screens[i]->setup();
   }
+  
   MIDI.begin(MIDI_CHANNEL_OFF);  
   normalMode.activate();  
 }
@@ -56,4 +57,5 @@ void loop() {
   }
 
   lightManager.updateLights();
+  modeManager.getMode().frameTick();
 }

@@ -17,6 +17,7 @@ class IMode
     virtual void activate() = 0;
     virtual void buttonPressed(const byte number) = 0;
     virtual void buttonLongPressed(const byte number) = 0;
+    virtual void frameTick() = 0;
 };
 
 class BankMode : public IMode
@@ -32,6 +33,7 @@ class BankMode : public IMode
     virtual void activate();
     virtual void buttonPressed(const byte number);
     virtual void buttonLongPressed(const byte number);
+    virtual void frameTick();
 
     byte getBank() const;
 
@@ -55,6 +57,7 @@ class NormalMode : public IMode
     virtual void activate();
     virtual void buttonPressed(const byte number);
     virtual void buttonLongPressed(const byte number);
+    virtual void frameTick();
 
   private:
     void sendMidi() const;    
@@ -81,6 +84,7 @@ class LooperMode : public IMode
     virtual void activate();
     virtual void buttonPressed(const byte number);
     virtual void buttonLongPressed(const byte number);
+    virtual void frameTick();
 
   private:
     LooperState play();
@@ -89,7 +93,8 @@ class LooperMode : public IMode
     LooperState record();
     LooperState longRecord();
     void updateState();
-    void updateMode(const char* line);    
+    void updateMode(const char* line);
+    void setRecordTime(); 
 
   private:
     midi_t& _midi;
@@ -97,6 +102,7 @@ class LooperMode : public IMode
     Screen** _ppScreens;
     LooperState _state;
     LoopGlyph _loopGlyph;
+    long _loopStartTime;
 };
 
 class ModeManager : public IButtonDelegate

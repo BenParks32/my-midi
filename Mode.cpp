@@ -117,6 +117,10 @@ byte BankMode::getBank() const
   return _activeBank;
 }
 
+void BankMode::frameTick()
+{  
+}
+
 //////////////////////////////////
 // Normal Mode
 NormalMode::NormalMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens, const BankMode& bankMode) :
@@ -186,6 +190,10 @@ void NormalMode::sendMidi() const
   _midi.sendProgramChange(patch, AMP_MIDI_CHANNEL);
 }
 
+void NormalMode::frameTick()
+{  
+}
+
 //////////////////////////////////
 // Looper Mode
 LooperMode::LooperMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens) :
@@ -193,7 +201,8 @@ LooperMode::LooperMode(midi_t& midi, const LightManager& lightManager, Screen** 
   _lightManager(lightManager),
   _ppScreens(ppScreens),
   _state(NO_LOOP),
-  _loopGlyph(LoopGlyph())
+  _loopGlyph(LoopGlyph()),
+  _loopStartTime(0)
 {
 }
 
@@ -271,6 +280,17 @@ void LooperMode::updateMode(const char* line)
   _ppScreens[SCREEN_FOUR]->draw(_loopGlyph);
 }
 
+void LooperMode::setRecordTime()
+{
+  if(_state == RECORDING)
+  {
+    long now = millis();
+    long length = now - _loopStartTime;
+    _loopGlyph.setLoopLength(length);
+    _loopGlyph.setStartTime(now);
+  }
+}
+
 void LooperMode::buttonPressed(const byte number)
 {  
   LooperState newState = _state;
@@ -286,7 +306,7 @@ void LooperMode::buttonPressed(const byte number)
     break;
 
     case BUTTON_THREE:
-      newState = this->record();
+      newState = this->record();      
     break;
   }
 
@@ -322,13 +342,31 @@ void LooperMode::buttonLongPressed(const byte number)
   }
 }
 
+void LooperMode::frameTick()
+{ 
+  switch(_state)
+  {
+    case PLAYING:
+    case OVER_DUBBING:
+    {      
+      _ppScreens[SCREEN_FOUR]->draw(_loopGlyph);
+    } break;
+  }
+}
+
 LooperState LooperMode::play()
 {
   switch(_state) {
     case STOPPED:
     case RECORDING:
     case OVER_DUBBING:
-    {
+    {      
+      this->setRecordTime();
+
+      if(_state==STOPPED)
+      {
+        _loopGlyph.setStartTime(millis());
+      }      
       _midi.sendControlChange(STOMP_LOOP_PLAY_STOP_CC, STOMP_LOOP_PLAY_VAL, STOMP_MIDI_CHANNEL);
       return PLAYING;
     } break;
@@ -344,6 +382,7 @@ LooperState LooperMode::stop()
     case OVER_DUBBING:
     case PLAYING:
     {
+      this->setRecordTime();
       _midi.sendControlChange(STOMP_LOOP_PLAY_STOP_CC, STOMP_LOOP_STOP_VAL, STOMP_MIDI_CHANNEL);
       return STOPPED;
     } break;
@@ -356,8 +395,11 @@ LooperState LooperMode::longStop()
 {
   switch(_state) {
     case STOPPED:
+    {
+      _loopGlyph.setStartTime(0);
+      _loopGlyph.setLoopLength(0);
       return NO_LOOP;
-    break;    
+    } break;    
   }
 
   return _state;
@@ -368,7 +410,8 @@ LooperState LooperMode::record()
   switch(_state) {
     case NO_LOOP:
     {
-      _midi.sendControlChange(STOMP_LOOP_RECORD_OVERDUB_CC, STOMP_LOOP_RECORD_VAL, STOMP_MIDI_CHANNEL);
+      _loopStartTime = millis();
+      _midi.sendControlChange(STOMP_LOOP_RECORD_OVERDUB_CC, STOMP_LOOP_RECORD_VAL, STOMP_MIDI_CHANNEL);      
       return RECORDING;
     } break;
 
@@ -376,6 +419,7 @@ LooperState LooperMode::record()
     case PLAYING:
     case RECORDING:
     {
+      this->setRecordTime();
       _midi.sendControlChange(STOMP_LOOP_RECORD_OVERDUB_CC, STOMP_LOOP_OVERDUB_VAL, STOMP_MIDI_CHANNEL);
       return OVER_DUBBING;
     } break;

@@ -97,12 +97,15 @@ class LoopGlyph : public IGlyph
   public:
     virtual void draw(screen_t& ctx);
     void setCaption(const char* caption);
-    void setTime(short newTime);
+    void setStartTime(long startTime);
+    void setLoopLength(long loopLength);
 
   private:
     const char* _caption;
-    const short _length;
-    short _time;
+    long _startTime;
+    long _loopLength;
+    long _chrono;
+    bool _repaint;
 };
 
 class Screen

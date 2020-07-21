@@ -154,28 +154,47 @@ void ModeGlyph::draw(screen_t& ctx)
 // LoopGlyph
 LoopGlyph::LoopGlyph() :
   _caption(NULL),
-  _length(0)
+  _startTime(0),
+  _loopLength(0),
+  _chrono(millis())
 {
 }
 
-void LoopGlyph::setTime(short newTime)
+void LoopGlyph::setStartTime(long startTime)
 {
-  _time = newTime;  
+  _startTime = startTime;  
+}
+
+void LoopGlyph::setLoopLength(long loopLength)
+{
+  _loopLength = loopLength;  
 }
 
 void LoopGlyph::setCaption(const char* caption)
 {
   _caption = caption;
+  _repaint = true;
 }
 
 void LoopGlyph::draw(screen_t& ctx)
 {
+  const long now = millis();
+  if(!_repaint && now - _chrono < 1000)
+    return;
+
+  _chrono = now;
+  _repaint = false;
+
+  const long time = ((now - _startTime) % _loopLength);
+  const int width = 108 * (time/(double)_loopLength);
+
   ctx.firstPage();
-  ctx.setFont(u8g2_font_logisoso20_tr);
+  ctx.setFont(u8g2_font_logisoso20_tr); 
 
   do {
     ctx.drawStr(10, 25, _caption);
-    ctx.drawFrame(10, 35, 108, 25);
+    ctx.drawBox(10, 37, width, 20);
+    ctx.drawFrame(10+width, 37, 108-width, 20);
   } while ( ctx.nextPage() );
 }
 
