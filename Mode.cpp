@@ -65,9 +65,9 @@ void BankMode::activate()
   const char* modeLines[2] = { "Select", "Bank" };
   ModeGlyph mode(modeLines, 2);
 
-  _ppScreens[SCREEN_ONE]->draw(arrowDown);
+  _ppScreens[SCREEN_ONE]->draw(arrowUp);
   _ppScreens[SCREEN_TWO]->draw(bankNumber);
-  _ppScreens[SCREEN_THREE]->draw(arrowUp);  
+  _ppScreens[SCREEN_THREE]->draw(arrowDown);  
   _ppScreens[SCREEN_FOUR]->draw(mode);  
 
   _lightManager.turnAllOff();
@@ -83,7 +83,7 @@ void BankMode::buttonPressed(const byte number)
 {
   switch(number)
   {
-    case BUTTON_THREE:
+    case BUTTON_ONE:
     {
       if(_activeBank > 0)
         --_activeBank;
@@ -91,7 +91,7 @@ void BankMode::buttonPressed(const byte number)
         _activeBank = MAX_PATCH;
     } break;
     
-    case BUTTON_ONE:
+    case BUTTON_THREE:
     {
       if(_activeBank < MAX_PATCH)
         ++_activeBank;

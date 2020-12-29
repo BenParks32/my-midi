@@ -19,11 +19,13 @@ Light led4(4, 9);
 Light *leds[BUTTON_COUNT] {&led1, &led2, &led3, &led4};
 LightManager lightManager(leds, BUTTON_COUNT);
 
-Screen scr1(A0);
-Screen scr2(A1);
-Screen scr3(A2);
-Screen scr4(A3);
-Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr3, &scr4};
+// Screen scr1(A0);
+// Screen scr2(A1);
+// Screen scr3(A2);
+// Screen scr4(A3);
+// Screen *screens[BUTTON_COUNT] {&scr1, &scr2, &scr3, &scr4};
+
+Screen *screens[BUTTON_COUNT];
 
 BankMode bankMode(MIDI, lightManager, screens);
 NormalMode normalMode(MIDI, lightManager, screens, bankMode);
@@ -40,8 +42,16 @@ Button btn4(4, 8, modeManager);
 Button *buttons[BUTTON_COUNT] {&btn1, &btn2, &btn3, &btn4};
 
 void setup() {
+  
   for (int i = 0; i < BUTTON_COUNT; ++i)
   {
+    screens[i] = new Screen(A0+i);
+    screens[i]->setup();
+  }
+
+  // does this fix the faded screens on cold startup?
+  for (int i = 0; i < BUTTON_COUNT; ++i)
+  {    
     screens[i]->setup();
   }
   
