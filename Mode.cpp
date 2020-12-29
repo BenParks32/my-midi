@@ -171,9 +171,9 @@ void NormalMode::buttonPressed(const byte number)
 
   _lightManager.turnOn(activeButton);
   updateScreen(activeButton, true);
-  sendMidi();
 
   _store.savePatch(activeButton);
+  sendMidi();  
 }
 
 void NormalMode::buttonLongPressed(const byte number)
