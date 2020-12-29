@@ -6,6 +6,7 @@
 #include "LightManager.h"
 #include "Button.h"
 #include "Screen.h"
+#include "Store.h"
 
 typedef midi::MidiInterface<HardwareSerial> midi_t;
 
@@ -23,7 +24,7 @@ class IMode
 class BankMode : public IMode
 {
   public:
-    BankMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens);
+    BankMode(midi_t& midi, Store& store, const LightManager& lightManager, Screen** ppScreens);
 
   private:
     BankMode();
@@ -35,19 +36,17 @@ class BankMode : public IMode
     virtual void buttonLongPressed(const byte number);
     virtual void frameTick();
 
-    byte getBank() const;
-
   private:
     midi_t& _midi;
+    Store& _store;
     const LightManager& _lightManager;
     Screen** _ppScreens;
-    byte _activeBank;
 };
 
 class NormalMode : public IMode
 {
   public:
-    NormalMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens, const BankMode& bankMode);
+    NormalMode(midi_t& midi, Store& store, const LightManager& lightManager, Screen** ppScreens);
 
   private:
     NormalMode();
@@ -65,10 +64,9 @@ class NormalMode : public IMode
 
   private:
     midi_t& _midi;
+    Store& _store;
     const LightManager& _lightManager;
     Screen** _ppScreens;
-    const BankMode& _bankMode;
-    byte _activeButton;
 };
 
 class LooperMode : public IMode

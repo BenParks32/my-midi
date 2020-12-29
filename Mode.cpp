@@ -2,8 +2,6 @@
 #include <Arduino.h>
 #include "Mode.h"
 
-const byte MAX_PATCH = 39;
-
 const byte BUTTON_ONE = 1;
 const byte BUTTON_TWO = 2;
 const byte BUTTON_THREE = 3;
@@ -48,11 +46,11 @@ const byte LOOPER_MODE = 2;
 
 //////////////////////////////////
 // Bank Mode
-BankMode::BankMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens) :
+BankMode::BankMode(midi_t& midi, Store& store, const LightManager& lightManager, Screen** ppScreens) :
   _midi(midi),
+  _store(store),
   _lightManager(lightManager),
-  _ppScreens(ppScreens),
-  _activeBank(0)
+  _ppScreens(ppScreens)
 {
 }
 
@@ -60,7 +58,7 @@ void BankMode::activate()
 {
   SymbolGlyph arrowDown(ARROW_DOWN);
   SymbolGlyph arrowUp(ARROW_UP);
-  BankNumberGlyph bankNumber(_activeBank);
+  BankNumberGlyph bankNumber(_store.getBank());
 
   const char* modeLines[2] = { "Select", "Bank" };
   ModeGlyph mode(modeLines, 2);
@@ -81,40 +79,38 @@ void BankMode::activate()
 
 void BankMode::buttonPressed(const byte number)
 {
+  byte activeBank = _store.getBank();
+
   switch(number)
   {
     case BUTTON_ONE:
     {
-      if(_activeBank > 0)
-        --_activeBank;
+      if(activeBank > 0)
+        --activeBank;
       else
-        _activeBank = MAX_PATCH;
+        activeBank = MAX_BANK;
     } break;
     
     case BUTTON_THREE:
     {
-      if(_activeBank < MAX_PATCH)
-        ++_activeBank;
+      if(activeBank < MAX_BANK)
+        ++activeBank;
       else
-        _activeBank = 0;
+        activeBank = 0;
     } break;
 
     default:
       break;
-  }
+  }  
 
-  BankNumberGlyph bankNumber(_activeBank);
+  BankNumberGlyph bankNumber(activeBank);
   _ppScreens[SCREEN_TWO]->draw(bankNumber);
-  _midi.sendProgramChange(_activeBank, STOMP_MIDI_CHANNEL);
+  _midi.sendProgramChange(activeBank, STOMP_MIDI_CHANNEL);
+  _store.saveBank(activeBank);
 }
 
 void BankMode::buttonLongPressed(const byte number)
 {
-}
-
-byte BankMode::getBank() const
-{
-  return _activeBank;
 }
 
 void BankMode::frameTick()
@@ -123,21 +119,22 @@ void BankMode::frameTick()
 
 //////////////////////////////////
 // Normal Mode
-NormalMode::NormalMode(midi_t& midi, const LightManager& lightManager, Screen** ppScreens, const BankMode& bankMode) :
+NormalMode::NormalMode(midi_t& midi, Store& store, const LightManager& lightManager, Screen** ppScreens) :
   _midi(midi),
+  _store(store),
   _lightManager(lightManager),
-  _ppScreens(ppScreens),
-  _bankMode(bankMode),
-  _activeButton(0)
+  _ppScreens(ppScreens)
 {
 }
 
 void NormalMode::activate()
 {
-  PatchGlyph patchA("A", _activeButton == BUTTON_ONE-1);
-  PatchGlyph patchB("B", _activeButton == BUTTON_TWO-1);
-  PatchGlyph patchC("C", _activeButton == BUTTON_THREE-1);
-  BankNumberGlyph bankNumber(_bankMode.getBank());
+  const byte activeButton = _store.getPatch();
+
+  PatchGlyph patchA("A", activeButton == BUTTON_ONE-1);
+  PatchGlyph patchB("B", activeButton == BUTTON_TWO-1);
+  PatchGlyph patchC("C", activeButton == BUTTON_THREE-1);
+  BankNumberGlyph bankNumber(_store.getBank());
 
   _ppScreens[SCREEN_ONE]->draw(patchA);
   _ppScreens[SCREEN_TWO]->draw(patchB);
@@ -150,7 +147,7 @@ void NormalMode::activate()
   _lightManager.setFlashing(LIGHT_FOUR, false);
   
   _lightManager.turnAllOff();
-  _lightManager.turnOn(_activeButton);  
+  _lightManager.turnOn(activeButton);  
   _lightManager.turnOn(LIGHT_FOUR);
   sendMidi();
 }
@@ -165,14 +162,18 @@ void NormalMode::updateScreen(const byte number, const bool active)
 
 void NormalMode::buttonPressed(const byte number)
 {
-  _lightManager.turnOff(_activeButton);
-  updateScreen(_activeButton, false);
+  byte activeButton = _store.getPatch();
 
-  _activeButton = number - 1;
+  _lightManager.turnOff(activeButton);
+  updateScreen(activeButton, false);
 
-  _lightManager.turnOn(_activeButton);
-  updateScreen(_activeButton, true);
-  sendMidi();  
+  activeButton = number - 1;
+
+  _lightManager.turnOn(activeButton);
+  updateScreen(activeButton, true);
+  sendMidi();
+
+  _store.savePatch(activeButton);
 }
 
 void NormalMode::buttonLongPressed(const byte number)
@@ -181,12 +182,14 @@ void NormalMode::buttonLongPressed(const byte number)
 
 void NormalMode::sendMidi() const
 {
+  const byte activeBank = _store.getBank();
+  const byte activeButton = _store.getPatch();
+
   // send the snap shot change to the stomp
-  _midi.sendControlChange(STOMP_SNAPSHOT_CC, _activeButton, STOMP_MIDI_CHANNEL);
+  _midi.sendControlChange(STOMP_SNAPSHOT_CC, activeButton, STOMP_MIDI_CHANNEL);
 
   // send program change to the amp
-  const byte activeBank = _bankMode.getBank();
-  byte patch = (activeBank * 3) + _activeButton;
+  byte patch = (activeBank * 3) + activeButton;
   _midi.sendProgramChange(patch, AMP_MIDI_CHANNEL);
 }
 
